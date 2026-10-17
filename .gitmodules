@@ -1,6 +1,3 @@
 [submodule "KernelSU"]
 	path = KernelSU
-	url = https://github.com/HyperRamzey/KernelSU.git
-[submodule "AnyKernel3"]
-	path = AnyKernel3
-	url = https://github.com/Roynas-Android-Playground/kernel_packaging_anykernel3
+	url = https://github.com/Baka-SU/BakaSU

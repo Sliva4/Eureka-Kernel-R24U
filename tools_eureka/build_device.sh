@@ -20,7 +20,7 @@ case "$CODENAME" in
 esac
 DEFCONFIG=full/exynos7885-${CODENAME}_defconfig
 
-TC=/root/toolchains
+TC=/opt/toolchains
 export PATH="$TC/bin:$PATH"
 export LD_LIBRARY_PATH="$TC/lib"
 export ARCH=arm64
@@ -28,15 +28,15 @@ export CROSS_COMPILE=aarch64-linux-gnu-
 export CROSS_COMPILE_ARM32=arm-linux-gnueabi-
 export CLANG_TRIPLE=aarch64-linux-gnu-
 export ANDROID_MAJOR_VERSION=r
-export KBUILD_BUILD_USER=HyperRamzey
-export KBUILD_BUILD_HOST=Eureka-R24U
+export KBUILD_BUILD_USER=Sliva4
+export KBUILD_BUILD_HOST=debian
 export LOCALVERSION=-R24U-KSU
 export PLATFORM_VERSION=11
 echo >.scmversion
 CORES=8
 
 echo "=== $CODENAME: defconfig ($DEFCONFIG — vendor full/) ==="
-rm -rf $OUT
+#rm -rf $OUT
 make O=$OUT ARCH=arm64 ANDROID_MAJOR_VERSION=r $DEFCONFIG >/dev/null
 grep -E 'CONFIG_(KSU|LTO_CLANG|CC_OPTIMIZE)' $OUT/.config | head -4
 
@@ -46,12 +46,8 @@ make O=$OUT -j$CORES \
   CC=clang HOSTCC=clang HOSTCXX=clang++ \
   LLVM_DIS=llvm-dis AR=llvm-ar NM=llvm-nm LD=ld.lld OBJDUMP=llvm-objdump STRIP=llvm-strip \
   CLANG_TRIPLE=aarch64-linux-gnu- \
-  CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
-  >/root/kbuild/build_${SUFFIX}.log 2>&1 || {
-    echo "BUILD_ERROR_$CODENAME"
-    tail -30 /root/kbuild/build_${SUFFIX}.log
-    exit 1
-  }
+  CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi-
+
 ls -la $OUT/arch/arm64/boot/Image || { echo "NO_IMAGE_$CODENAME"; exit 1; }
 strings $OUT/arch/arm64/boot/Image | grep -m1 'Linux version'
 echo "release: $(cat $OUT/include/config/kernel.release) (utsrelease $(cat $OUT/include/config/kernel.release | wc -c) chars)"
@@ -65,7 +61,7 @@ cp -f $OUT/arch/arm64/boot/dtb.img $AK/dtb.img
 # release dtbo; proven fix for the a30s bootlogo hang). Devices without a stock
 # dtbo in kernel_zip/dtbo/ package WITHOUT dtbo flash (m20/jackpotlte).
 if [ -f "kernel_zip/dtbo/$CODENAME/dtbo.img" ]; then
-  python3 /mnt/g/projects/eureka-build-tools/dtbo_gen.py \
+  python3 tools_eureka/dtbo_gen.py \
     "kernel_zip/dtbo/$CODENAME/dtbo.img" "$AK/dtbo.img" || {
       echo "DTBO_PATCH_ERROR_$CODENAME"
       exit 1

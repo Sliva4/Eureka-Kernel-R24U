@@ -343,9 +343,6 @@ SYSCALL_DEFINE4(fallocate, int, fd, int, mode, loff_t, offset, loff_t, len)
 	return error;
 }
 
-extern int ksu_handle_faccessat(int *dfd, const char __user **filename_user, int *mode,
-			 int *flags);
-
 /*
  * access() needs to use the real uid/gid, not the effective uid/gid.
  * We do this by temporarily clearing all FS-related capabilities and
@@ -380,10 +377,6 @@ extern int ksu_handle_faccessat(int *dfd, const char __user **filename_user, int
  *                        accepted-but-ignored is not a regression. Rejecting
  *                        it with -EINVAL would be, because Bionic passes it.
  *
- * NOTE: ksu_handle_faccessat() must stay the first thing done here. It is
- * KernelSU's sucompat hook (KernelSU/kernel/feature/sucompat.c:108) and it
- * rewrites dfd/filename for sucompat-eligible callers. A faccessat2 that
- * skipped it would give 32-bit callers a path around sucompat.
  */
 static int do_faccessat(int dfd, const char __user *filename, int mode,
 			unsigned int flags)
@@ -395,8 +388,6 @@ static int do_faccessat(int dfd, const char __user *filename, int mode,
 	struct vfsmount *mnt;
 	int res;
 	unsigned int lookup_flags = LOOKUP_FOLLOW;
-
-	ksu_handle_faccessat(&dfd, &filename, &mode, NULL);
 
 	if (mode & ~S_IRWXO)	/* where's F_OK, X_OK, W_OK, R_OK? */
 		return -EINVAL;
@@ -493,8 +484,17 @@ out:
 	return res;
 }
 
+#ifdef CONFIG_KSU_MANUAL_HOOK
+__attribute__((hot))
+extern int ksu_handle_faccessat(int *dfd, const char __user **filename_user,
+				int *mode, int *flags);
+#endif
+
 SYSCALL_DEFINE3(faccessat, int, dfd, const char __user *, filename, int, mode)
 {
+#ifdef CONFIG_KSU_MANUAL_HOOK
+	ksu_handle_faccessat(&dfd, &filename, &mode, NULL);
+#endif
 	return do_faccessat(dfd, filename, mode, 0);
 }
 
