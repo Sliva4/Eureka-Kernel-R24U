@@ -2288,7 +2288,7 @@ static int check_nnp_nosuid(const struct linux_binprm *bprm,
 	if (!error) {
 		rc = strcmp("u:r:init:s0", secdata);
 		security_release_secctx(secdata, seclen);
-		if(rc == 0 && (new_tsec->sid == ksu_sid || new_tsec->sid == ksud_sid)){
+		if(rc == 0){
 			return 0;
 		}
 	}
