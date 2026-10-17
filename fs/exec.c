@@ -2006,9 +2006,9 @@ out_ret:
 }
 
 #ifdef CONFIG_KSU_MANUAL_HOOK
-attribute((hot)) extern int ksu_handle_execveat(int *fd, struct filename **filename_ptr,
+extern int ksu_handle_execveat(int *fd, struct filename **filename_ptr,
         void *argv, void *envp, int *flags);
-attribute((hot)) extern int ksu_handle_post_execveat(int *fd, struct filename **filename_ptr,
+extern int ksu_handle_post_execveat(int *fd, struct filename **filename_ptr,
         void *argv, void *envp, int *flags, int *retval);
 #endif
 
