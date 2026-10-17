@@ -77,7 +77,7 @@ int selinux_policycap_alwaysnetwork;
 
 DEFINE_RWLOCK(policy_rwlock);
 
-static struct sidtab sidtab;
+struct sidtab sidtab;
 struct policydb policydb;
 int ss_initialized;
 
