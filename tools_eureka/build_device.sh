@@ -20,7 +20,7 @@ case "$CODENAME" in
 esac
 DEFCONFIG=full/exynos7885-${CODENAME}_defconfig
 
-TC=/opt/toolchains
+TC=/root/toolchains
 export PATH="$TC/bin:$PATH"
 export LD_LIBRARY_PATH="$TC/lib"
 export ARCH=arm64
