@@ -2283,15 +2283,6 @@ static int check_nnp_nosuid(const struct linux_binprm *bprm,
 
 	if (new_tsec->sid == old_tsec->sid)
 		return 0; /* No change in credentials */
-	
-	error = security_secid_to_secctx(old_tsec->sid, &secdata, &seclen);
-	if (!error) {
-		rc = strcmp("u:r:init:s0", secdata);
-		security_release_secctx(secdata, seclen);
-		if(rc == 0){
-			return 0;
-		}
-	}
 
 	/*
 	 * The only transitions we permit under NNP or nosuid
